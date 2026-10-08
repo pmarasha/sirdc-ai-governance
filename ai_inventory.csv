@@ -1,0 +1,13 @@
+id,name,description,owner,department,institute,purpose,data_types,model_type,vendor,users,risk_tier,status,last_review,next_review,controls,incidents
+1,HR Policy Chatbot,Answers employee HR questions,Alice Moyo,HR,Corporate Services,Reduce HR ticket volume,Internal policies,LLM,OpenAI,All staff,Limited,Live,2026-09-01,2027-03-01,Access control; logging,None
+2,Crop Yield Prediction,Forecasts maize yield from weather and soil data,Tendai Ncube,Research,Agriculture,Improve farmer advisory,Soil data; weather data,ML model,Custom,Internal researchers,Limited,Pilot,2026-08-15,2027-02-15,Human review; logging,None
+3,Medical Imaging Triage,Flags anomalies in X-ray images,Dr Chikwanha,Research,Health,Assist radiologists,Medical images (anonymised),Deep learning,Custom,Clinicians,High,Development,2026-07-01,2027-01-01,Human-in-loop; audit log,None
+4,Manufacturing Quality Control,Detects defects on production line,Farai Dube,Engineering,Manufacturing,Reduce waste,Camera images,Computer vision,Custom,Factory staff,Limited,Live,2026-09-10,2027-03-10,Logging,None
+5,Research Paper Summariser,Summarises academic papers for staff,Dr Mutasa,Research,ICT,Save researcher time,Public papers,LLM,OpenAI,Researchers,Minimal,Live,2026-09-20,2027-09-20,None,None
+6,Procurement Fraud Detector,Flags suspicious procurement patterns,Rudo Nyathi,Finance,Corporate Services,Reduce fraud,Financial records,ML model,Custom,Finance team,High,Pilot,2026-06-01,2026-12-01,Human review; audit log,None
+7,Energy Load Forecaster,Predicts electricity demand,Tapiwa Banda,Engineering,Energy,Grid planning,Historical load data,Time series,Custom,Engineers,Limited,Development,2026-08-01,2027-02-01,Logging,None
+8,Staff Recruitment Screener,Ranks CVs for shortlisting,Nomsa Zulu,HR,Corporate Services,Speed up hiring,CV data (personal),ML model,Vendor X,HR team,High,Development,2026-05-01,2026-11-01,Pending,None
+9,Mining Safety Monitor,Detects unsafe conditions underground,Kudzai Sibanda,Research,Mining,Worker safety,Sensor data,ML model,Custom,Mine operators,High,Live,2026-09-05,2027-03-05,Human-in-loop; audit log,None
+10,Internal Knowledge Search,Semantic search over SIRDC documents,Peter Mhaka,IT,ICT,Improve knowledge access,Internal documents,LLM + vector DB,Custom,All staff,Minimal,Live,2026-09-25,2027-09-25,Access control,None
+11,Legacy Chatbot,Old chatbot still in use but never reviewed,John Doe,IT,ICT,Answer internal questions,Internal FAQ,LLM,OpenAI,Staff,Limited,Live,2025-01-01,2026-09-01,None,None
+12,Facial Recognition Access,Access control using face recognition,Security Team,Security,Corporate Services,Building access control,Biometric data,Computer vision,Vendor Y,Staff,High,Live,2026-08-01,2026-10-01,None,None

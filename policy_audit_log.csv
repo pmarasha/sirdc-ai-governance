@@ -1,0 +1,6 @@
+timestamp,question,answer
+2026-10-08T14:21:55,Can I send employee salaries to ChatGPT?,"No, personal data such as salaries MUST NOT be sent to any public LLM, including ChatGPT, as stated in [Section 4.1]."
+2026-10-08T14:22:15,What is the review cadence for a facial recognition system?,"A facial recognition system is classified as a High-risk system, which requires a review every 6 months [Section 6.1]."
+2026-10-08T14:22:27,What is SIRDC's position on quantum computing?,This is not covered in the policy. Recommend escalating to the AI Review Board.
+2026-10-08T14:27:15,Can I send employee salaries to ChatGPT?,"No, personal data such as salaries MUST NOT be sent to any public LLM, including ChatGPT, as stated in [Section 4.1]."
+2026-10-08T14:27:30,Do I need approval to buy a third-party AI tool?,"Yes, third-party AI tools MUST undergo a governance review before purchase [Section 9.1]."
