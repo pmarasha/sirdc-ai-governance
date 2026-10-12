@@ -6,7 +6,7 @@ import plotly.express as px
 from datetime import date, datetime
 from pathlib import Path
 from dotenv import load_dotenv
-from openai import OpenAI
+from google import genai
 
 # ---------- Config ----------
 st.set_page_config(
@@ -173,7 +173,6 @@ st.markdown(
         box-shadow: 0 2px 6px rgba(0,0,0,0.03);
     }
 
-    /* Keep tab panels below the sticky bar */
     .stTabs [data-baseweb="tab-panel"] {
         padding-top: 16px;
     }
@@ -245,7 +244,7 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# ---------- LLM setup ----------
+# ---------- LLM setup (Gemini) ----------
 load_dotenv()
 POLICY_FILE = "ai_policy.md"
 LOG_FILE = "policy_audit_log.csv"
@@ -271,13 +270,16 @@ def log_interaction(question: str, answer: str) -> None:
 
 
 def ask_policy(question: str) -> str:
-    api_key = os.getenv("OPENAI_API_KEY")
+    api_key = os.getenv("GEMINI_API_KEY")
     if not api_key:
-        return "OpenAI API key not configured. Add OPENAI_API_KEY to your .env file."
+        return ("Gemini API key not configured. Add GEMINI_API_KEY to your "
+                ".env file or Streamlit Secrets.")
     policy_text = get_policy_text()
     if not policy_text:
         return f"Policy file '{POLICY_FILE}' not found."
-    client = OpenAI(api_key=api_key)
+
+    client = genai.Client(api_key=api_key)
+
     system_prompt = f"""You are SIRDC's AI Governance Assistant.
 Answer ONLY using the policy below. Cite section numbers like [Section 4.1].
 If the answer is not in the policy, say:
@@ -287,15 +289,16 @@ Never invent rules. Keep answers under 120 words.
 POLICY:
 {policy_text}
 """
-    response = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": question},
-        ],
-        temperature=0.1,
-    )
-    answer = response.choices[0].message.content.strip()
+
+    try:
+        response = client.models.generate_content(
+            model="gemini-2.0-flash",
+            contents=f"{system_prompt}\n\nUser question: {question}",
+        )
+        answer = (response.text or "").strip()
+    except Exception as e:
+        return f"Error contacting Gemini: {e}"
+
     log_interaction(question, answer)
     return answer
 
@@ -619,10 +622,10 @@ with tab1:
             Zimbabwe National AI Strategy (2026–2030).
 
             **Policy Assistant** — Answers use only the SIRDC AI Policy document
-            as its source. Every interaction is logged. It does not make binding
-            decisions — escalate to the AI Review Board.
+            as its source, powered by Google Gemini. Every interaction is logged.
+            It does not make binding decisions — escalate to the AI Review Board.
 
-            **Version** — v1.9 · Phase 1 · {today}
+            **Version** — v2.0 · Phase 1 · {today}
             """
         )
 
@@ -950,7 +953,7 @@ with tab4:
 st.markdown(
     "<hr style='border:1px solid #E5E7EB; margin-top:24px;'>"
     "<p style='text-align:center; color:#9CA3AF; font-size:12px; margin:0;'>"
-    "SIRDC AI Governance Framework · v1.9 · Aligned with NIST AI RMF and ISO/IEC 42001 · Internal use only"
+    "SIRDC AI Governance Framework · v2.0 · Aligned with NIST AI RMF and ISO/IEC 42001 · Internal use only"
     "</p>",
     unsafe_allow_html=True,
 )
