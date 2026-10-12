@@ -11,3 +11,4 @@ id,name,description,owner,department,institute,purpose,data_types,model_type,ven
 10,Internal Knowledge Search,Semantic search over SIRDC documents,Peter Mhaka,IT,ICT,Improve knowledge access,Internal documents,LLM + vector DB,Custom,All staff,Minimal,Live,2026-09-25,2027-09-25,Access control,None
 11,Legacy Chatbot,Old chatbot still in use but never reviewed,John Doe,IT,ICT,Answer internal questions,Internal FAQ,LLM,OpenAI,Staff,Limited,Live,2025-01-01,2026-09-01,None,None
 12,Facial Recognition Access,Access control using face recognition,Security Team,Security,Corporate Services,Building access control,Biometric data,Computer vision,Vendor Y,Staff,High,Live,2026-08-01,2026-10-01,None,None
+13,Disease Modelling Platform,Simulates disease spread in crop populations,Muscline Ganda,Research,Health,Disease outbreak prediction for agricultural planning,Public data; Confidential research,ML model,Internal,Researchers,Pending,Pending Review,2026-10-12,,Pending review,None

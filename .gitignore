@@ -2,3 +2,4 @@
 __pycache__/
 *.pyc
 policy_audit_log.csv
+incidents.csv
