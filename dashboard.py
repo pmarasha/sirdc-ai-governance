@@ -450,6 +450,12 @@ if "last_submission" not in st.session_state:
 if "last_incident" not in st.session_state:
     st.session_state.last_incident = None
 
+if "chat_history" not in st.session_state:
+    st.session_state.chat_history = []
+
+if "pending_question" not in st.session_state:
+    st.session_state.pending_question = None
+
 
 # ---------- Modern hero header ----------
 logo_html = ""
@@ -654,7 +660,7 @@ with tab1:
             as its source, powered by Google Gemini. Every interaction is logged.
             It does not make binding decisions — escalate to the AI Review Board.
 
-            **Version** — v2.2 · Phase 1 · {today}
+            **Version** — v2.3 · Phase 1 · {today}
             """
         )
 
@@ -935,16 +941,13 @@ with tab3:
             """
         )
 
-# ============ TAB 4: POLICY ASSISTANT (streaming) ============
+# ============ TAB 4: POLICY ASSISTANT (no duplicates) ============
 with tab4:
     st.subheader("AI Policy Assistant")
     st.caption(
         "Ask any question about SIRDC's AI Policy. Answers cite the relevant "
         "section and every interaction is logged for audit."
     )
-
-    if "chat_history" not in st.session_state:
-        st.session_state.chat_history = []
 
     st.markdown("**Suggested questions**")
     suggestions = [
@@ -953,42 +956,45 @@ with tab4:
         "Can I use anonymised patient data to train a model?",
         "Do I need approval to buy a third-party AI tool?",
     ]
+
     cols = st.columns(2)
     for i, s in enumerate(suggestions):
         if cols[i % 2].button(s, key=f"sugg_{i}", use_container_width=True):
             st.session_state.chat_history.append(("user", s))
-            with st.chat_message("assistant"):
-                placeholder = st.empty()
-                collected = ""
-                for chunk in stream_policy(s):
-                    collected += chunk
-                    placeholder.markdown(collected)
-            st.session_state.chat_history.append(("assistant", collected))
+            st.session_state.pending_question = s
+            st.rerun()
 
     st.divider()
 
+    # Render chat history
     for role, msg in st.session_state.chat_history:
         with st.chat_message(role):
             st.markdown(msg)
 
-    question = st.chat_input("Ask a policy question...")
-    if question:
-        st.session_state.chat_history.append(("user", question))
-        with st.chat_message("user"):
-            st.markdown(question)
+    # Stream pending answer right here, once
+    if st.session_state.pending_question:
+        q = st.session_state.pending_question
+        st.session_state.pending_question = None
         with st.chat_message("assistant"):
             placeholder = st.empty()
             collected = ""
-            for chunk in stream_policy(question):
+            for chunk in stream_policy(q):
                 collected += chunk
                 placeholder.markdown(collected)
         st.session_state.chat_history.append(("assistant", collected))
+
+    # Chat input
+    question = st.chat_input("Ask a policy question...")
+    if question:
+        st.session_state.chat_history.append(("user", question))
+        st.session_state.pending_question = question
+        st.rerun()
 
 # ---------- Footer ----------
 st.markdown(
     "<hr style='border:1px solid #E5E7EB; margin-top:24px;'>"
     "<p style='text-align:center; color:#9CA3AF; font-size:12px; margin:0;'>"
-    "SIRDC AI Governance Framework · v2.2 · Aligned with NIST AI RMF and ISO/IEC 42001 · Internal use only"
+    "SIRDC AI Governance Framework · v2.3 · Aligned with NIST AI RMF and ISO/IEC 42001 · Internal use only"
     "</p>",
     unsafe_allow_html=True,
 )
