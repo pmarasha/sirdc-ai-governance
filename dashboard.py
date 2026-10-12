@@ -1,5 +1,6 @@
 import os
 import csv
+import time  # <-- Added for the retry logic
 import streamlit as st
 import pandas as pd
 import plotly.express as px
@@ -249,6 +250,9 @@ load_dotenv()
 POLICY_FILE = "ai_policy.md"
 LOG_FILE = "policy_audit_log.csv"
 
+# Models to try, in order of preference.
+GEMINI_MODELS = ["gemini-3.8-flash", "gemini-2.5-flash"]
+
 
 def get_policy_text() -> str:
     if Path(POLICY_FILE).exists():
@@ -290,17 +294,29 @@ POLICY:
 {policy_text}
 """
 
-    try:
-        response = client.models.generate_content(
-            model="gemini-3.8-flash",
-            contents=f"{system_prompt}\n\nUser question: {question}",
-        )
-        answer = (response.text or "").strip()
-    except Exception as e:
-        return f"Error contacting Gemini: {e}"
+    # Try each model in the list, with exponential backoff on 503.
+    last_error = None
+    for model_name in GEMINI_MODELS:
+        delay = 1.0  # start with 1 second
+        for attempt in range(3):  # up to 3 attempts per model
+            try:
+                response = client.models.generate_content(
+                    model=model_name,
+                    contents=f"{system_prompt}\n\nUser question: {question}",
+                )
+                answer = (response.text or "").strip()
+                log_interaction(question, answer)
+                return answer
+            except Exception as e:
+                last_error = e
+                # If it's a 503, wait and retry; otherwise break to next model.
+                if "503" in str(e) or "UNAVAILABLE" in str(e).upper():
+                    time.sleep(delay)
+                    delay *= 2  # exponential backoff
+                else:
+                    break
 
-    log_interaction(question, answer)
-    return answer
+    return f"Error contacting Gemini after retries: {last_error}"
 
 
 # ---------- Data helpers ----------
@@ -625,7 +641,7 @@ with tab1:
             as its source, powered by Google Gemini. Every interaction is logged.
             It does not make binding decisions — escalate to the AI Review Board.
 
-            **Version** — v2.0 · Phase 1 · {today}
+            **Version** — v2.1 · Phase 1 · {today}
             """
         )
 
@@ -953,7 +969,7 @@ with tab4:
 st.markdown(
     "<hr style='border:1px solid #E5E7EB; margin-top:24px;'>"
     "<p style='text-align:center; color:#9CA3AF; font-size:12px; margin:0;'>"
-    "SIRDC AI Governance Framework · v2.0 · Aligned with NIST AI RMF and ISO/IEC 42001 · Internal use only"
+    "SIRDC AI Governance Framework · v2.1 · Aligned with NIST AI RMF and ISO/IEC 42001 · Internal use only"
     "</p>",
     unsafe_allow_html=True,
 )
