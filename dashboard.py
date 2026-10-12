@@ -292,7 +292,7 @@ POLICY:
 
     try:
         response = client.models.generate_content(
-            model="gemini-2.0-flash",
+            model="gemini-3.8-flash",
             contents=f"{system_prompt}\n\nUser question: {question}",
         )
         answer = (response.text or "").strip()
