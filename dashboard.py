@@ -1,6 +1,6 @@
 import os
 import csv
-import time  # <-- Added for the retry logic
+import time
 import streamlit as st
 import pandas as pd
 import plotly.express as px
@@ -87,6 +87,9 @@ INCIDENT_COLUMNS = [
     "description", "harm_occurred", "immediate_action",
     "status",
 ]
+
+# Models to try, in order of preference.
+GEMINI_MODELS = ["gemini-3.8-flash", "gemini-2.5-flash"]
 
 # ---------- CSS ----------
 st.markdown(
@@ -250,11 +253,10 @@ load_dotenv()
 POLICY_FILE = "ai_policy.md"
 LOG_FILE = "policy_audit_log.csv"
 
-# Models to try, in order of preference.
-GEMINI_MODELS = ["gemini-3.8-flash", "gemini-2.5-flash"]
 
-
+@st.cache_data(show_spinner=False)
 def get_policy_text() -> str:
+    """Cache policy text so it is read from disk only once per session."""
     if Path(POLICY_FILE).exists():
         return Path(POLICY_FILE).read_text(encoding="utf-8")
     return ""
@@ -273,18 +275,8 @@ def log_interaction(question: str, answer: str) -> None:
         ])
 
 
-def ask_policy(question: str) -> str:
-    api_key = os.getenv("GEMINI_API_KEY")
-    if not api_key:
-        return ("Gemini API key not configured. Add GEMINI_API_KEY to your "
-                ".env file or Streamlit Secrets.")
-    policy_text = get_policy_text()
-    if not policy_text:
-        return f"Policy file '{POLICY_FILE}' not found."
-
-    client = genai.Client(api_key=api_key)
-
-    system_prompt = f"""You are SIRDC's AI Governance Assistant.
+def build_prompt(question: str, policy_text: str) -> str:
+    return f"""You are SIRDC's AI Governance Assistant.
 Answer ONLY using the policy below. Cite section numbers like [Section 4.1].
 If the answer is not in the policy, say:
 "This is not covered in the policy. Recommend escalating to the AI Review Board."
@@ -292,31 +284,52 @@ Never invent rules. Keep answers under 120 words.
 
 POLICY:
 {policy_text}
+
+User question: {question}
 """
 
-    # Try each model in the list, with exponential backoff on 503.
+
+def stream_policy(question: str):
+    """Generator that yields answer chunks as they arrive from Gemini."""
+    api_key = os.getenv("GEMINI_API_KEY")
+    if not api_key:
+        yield "Gemini API key not configured. Add GEMINI_API_KEY to Streamlit Secrets."
+        return
+
+    policy_text = get_policy_text()
+    if not policy_text:
+        yield f"Policy file '{POLICY_FILE}' not found."
+        return
+
+    client = genai.Client(api_key=api_key)
+    prompt = build_prompt(question, policy_text)
+
     last_error = None
     for model_name in GEMINI_MODELS:
-        delay = 1.0  # start with 1 second
-        for attempt in range(3):  # up to 3 attempts per model
+        delay = 0.5
+        for attempt in range(2):
             try:
-                response = client.models.generate_content(
+                stream = client.models.generate_content_stream(
                     model=model_name,
-                    contents=f"{system_prompt}\n\nUser question: {question}",
+                    contents=prompt,
                 )
-                answer = (response.text or "").strip()
-                log_interaction(question, answer)
-                return answer
+                collected = []
+                for chunk in stream:
+                    text = getattr(chunk, "text", "") or ""
+                    if text:
+                        collected.append(text)
+                        yield text
+                log_interaction(question, "".join(collected).strip())
+                return
             except Exception as e:
                 last_error = e
-                # If it's a 503, wait and retry; otherwise break to next model.
                 if "503" in str(e) or "UNAVAILABLE" in str(e).upper():
                     time.sleep(delay)
-                    delay *= 2  # exponential backoff
+                    delay *= 2
                 else:
                     break
 
-    return f"Error contacting Gemini after retries: {last_error}"
+    yield f"\n\n_Could not reach Gemini: {last_error}_"
 
 
 # ---------- Data helpers ----------
@@ -641,7 +654,7 @@ with tab1:
             as its source, powered by Google Gemini. Every interaction is logged.
             It does not make binding decisions — escalate to the AI Review Board.
 
-            **Version** — v2.1 · Phase 1 · {today}
+            **Version** — v2.2 · Phase 1 · {today}
             """
         )
 
@@ -922,7 +935,7 @@ with tab3:
             """
         )
 
-# ============ TAB 4: POLICY ASSISTANT ============
+# ============ TAB 4: POLICY ASSISTANT (streaming) ============
 with tab4:
     st.subheader("AI Policy Assistant")
     st.caption(
@@ -944,9 +957,13 @@ with tab4:
     for i, s in enumerate(suggestions):
         if cols[i % 2].button(s, key=f"sugg_{i}", use_container_width=True):
             st.session_state.chat_history.append(("user", s))
-            with st.spinner("Consulting policy..."):
-                ans = ask_policy(s)
-            st.session_state.chat_history.append(("assistant", ans))
+            with st.chat_message("assistant"):
+                placeholder = st.empty()
+                collected = ""
+                for chunk in stream_policy(s):
+                    collected += chunk
+                    placeholder.markdown(collected)
+            st.session_state.chat_history.append(("assistant", collected))
 
     st.divider()
 
@@ -960,16 +977,18 @@ with tab4:
         with st.chat_message("user"):
             st.markdown(question)
         with st.chat_message("assistant"):
-            with st.spinner("Consulting policy..."):
-                answer = ask_policy(question)
-            st.markdown(answer)
-        st.session_state.chat_history.append(("assistant", answer))
+            placeholder = st.empty()
+            collected = ""
+            for chunk in stream_policy(question):
+                collected += chunk
+                placeholder.markdown(collected)
+        st.session_state.chat_history.append(("assistant", collected))
 
 # ---------- Footer ----------
 st.markdown(
     "<hr style='border:1px solid #E5E7EB; margin-top:24px;'>"
     "<p style='text-align:center; color:#9CA3AF; font-size:12px; margin:0;'>"
-    "SIRDC AI Governance Framework · v2.1 · Aligned with NIST AI RMF and ISO/IEC 42001 · Internal use only"
+    "SIRDC AI Governance Framework · v2.2 · Aligned with NIST AI RMF and ISO/IEC 42001 · Internal use only"
     "</p>",
     unsafe_allow_html=True,
 )
