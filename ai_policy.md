@@ -1,59 +1,161 @@
-# SIRDC AI POLICY v1.0 (Draft)
+# SIRDC ARTIFICIAL INTELLIGENCE GOVERNANCE POLICY
+## Reference for the Policy Assistant
 
-## Section 1 — Purpose
-This policy governs the use, development, procurement, and deployment of
-Artificial Intelligence systems across all SIRDC institutes.
+Source: SIRDC AI Governance Policy, Document AIGP/01, Revision 01
+Responsible Institute: Informatics and Artificial Intelligence Institute
+Status: DRAFT — pending management approval
 
-## Section 2 — Scope
-Applies to all staff, contractors, and researchers who design, build,
-purchase, or operate AI systems.
+---
 
-## Section 3 — Risk Classification
-All AI systems MUST be assigned one of four tiers:
-- Prohibited: social scoring, mass surveillance, manipulation of minors.
-- High: medical diagnosis, HR screening, biometric identification,
-  safety-critical systems, credit/eligibility decisions.
-- Limited: chatbots, content generation, internal recommendation engines.
-- Minimal: spam filters, internal search, productivity tools.
+## Section 7 — Guiding Principles
 
-## Section 4 — Data Protection
-4.1 Personal data (names, IDs, salaries, medical records, biometrics)
-    MUST NOT be sent to any public LLM (e.g., ChatGPT, Gemini).
-4.2 Confidential research data MUST NOT be sent to any public LLM
-    unless approved in writing by the AI Review Board.
-4.3 Anonymised or synthetic data may be used with public LLMs.
-4.4 Any use of personal data for model training requires:
-    (a) explicit consent, OR
-    (b) irreversible anonymisation, AND
-    (c) AI Review Board approval.
+7.1 Human-centricity and Ubuntu-based ethics
+7.2 Lawfulness, fairness and transparency
+7.3 Data sovereignty and purpose limitation
+7.4 Safety, security and robustness
+7.5 Inclusivity, accessibility and non-discrimination
+7.6 Local-first and developmental orientation
+7.7 Innovation with accountability
+7.8 Sustainability
+7.9 Collaboration and responsible knowledge sharing
 
-## Section 5 — Human Oversight
-5.1 All High-risk systems MUST have a named human-in-the-loop reviewer.
-5.2 All High-risk decisions MUST be logged with reviewer name and timestamp.
-5.3 Prohibited systems MUST NOT be developed or deployed under any
-    circumstances.
+---
 
-## Section 6 — Review Cadence
-6.1 High-risk systems: review every 6 months.
-6.2 Limited-risk systems: review every 12 months.
-6.3 Minimal-risk systems: review every 12 months.
-6.4 Overdue reviews MUST be escalated to the institute lead within 7 days.
+## Section 8 — Governance Structure
 
-## Section 7 — Transparency
-7.1 Every AI system MUST be registered in the SIRDC AI Inventory.
-7.2 Users MUST be informed when they are interacting with an AI system.
-7.3 Model cards MUST be produced for all High-risk systems.
+8.1 Ultimate accountability: Chief Executive Officer under Board oversight.
 
-## Section 8 — Incident Reporting
-8.1 Any harm, bias, or unexpected behaviour from an AI system MUST be
-    reported within 24 hours to the AI Governance Lead.
-8.2 Incidents MUST be logged in the dashboard.
+8.2 AI Stage Gate Governance Committee reviews significant AI projects and
+all High-risk systems. It applies the risk classification approach, oversees
+AI impact/risk assessments, and reports to the CEO.
 
-## Section 9 — Procurement
-9.1 Third-party AI tools MUST undergo a governance review before purchase.
-9.2 Vendors MUST provide documentation of their training data and
-    data retention practices.
+8.3 The Data Protection Officer handles personal-information matters.
+The ICT / information security function handles cyber-security matters.
 
-## Section 10 — Enforcement
-Violations may result in suspension of the AI system, retraining
-requirements, or disciplinary action.
+8.4 Risk classification (see Appendix B): every AI system is classified as
+Minimal, Limited, or High risk. High-risk systems require formal impact
+assessment, enhanced documentation, designed human oversight, and
+visibility to the AI Stage Gate Governance Committee before deployment.
+
+**There are exactly THREE risk tiers: Minimal, Limited, and High.**
+There is no "Prohibited" tier in this policy.
+
+---
+
+## Section 9 — Mandatory Policy Requirements
+
+### 9.1 Lawful Basis, Ethics and Compliance
+All AI activities comply with the Cyber and Data Protection Act [Chapter 12:07],
+the SIRDC ICT and Information Management Policy, and the SIRDC Intellectual
+Property Policy.
+
+### 9.2 Risk Classification and Proportionate Controls
+AI systems are classified as Minimal, Limited, or High risk. High-risk systems
+require a formal AI impact/risk assessment before operational deployment.
+Controls and documentation are proportionate to the assigned risk level.
+
+### 9.3 Human Oversight and Accountability
+Section 25 of the Cyber and Data Protection Act applies: data subjects have
+the right not to be subject to decisions based solely on automated processing
+with legal or similarly significant effects, except as permitted by the Act.
+High-risk systems require documented human oversight mechanisms.
+Accountability cannot be delegated to a vendor or to the AI system itself.
+
+### 9.4 Data Protection, Privacy and Security
+Personal data must be processed lawfully, fairly, transparently, and only for
+specified purposes. Security breaches affecting personal data MUST be notified
+to the Data Protection Authority within 24 hours of becoming aware.
+Personal data may be transferred outside Zimbabwe only in accordance with
+the Cyber and Data Protection Act.
+
+### 9.5 Transparency, Documentation and Traceability
+Material AI systems must have documentation covering purpose, intended use,
+data sources, known limitations, and the nature of human oversight.
+Documentation intensity is proportionate to risk and complexity.
+
+### 9.6 Third-Party AI and External Collaboration
+Procurement and use of third-party AI systems requires due diligence covering
+security posture, data handling, and contractual protections.
+Contracts MUST preserve confidentiality of SIRDC research data, preserve SIRDC
+ownership of intellectual property, prohibit unauthorised training of external
+models on SIRDC data, and include data-protection clauses.
+
+### 9.7 Intellectual Property and Research Outputs
+Outputs produced through AI systems (datasets, models, algorithms, software,
+prototypes, publications) are SIRDC Intellectual Property, administered
+through the Technology Transfer Office.
+
+### 9.8 Research, Experimentation and Innovation
+Responsible research is encouraged. Research and experimentation are NOT
+exempt from ethical, legal, privacy, security and safety obligations.
+Transition from research to operational deployment is a formal governance
+transition point that triggers additional requirements.
+
+### 9.9 Capacity Development and Awareness
+AI literacy across staff. Completion of designated training may be a
+condition of involvement in higher-risk AI activities.
+
+### 9.10 Incident Management and Breach Notification
+Material AI-related incidents must be reported through institutional channels
+without delay. Security breaches affecting personal data MUST be notified to
+the Data Protection Authority within 24 hours of becoming aware.
+Material incidents require root-cause review.
+
+**Data breach procedure:**
+1. Report internally via the Report Incident tab immediately.
+2. The AI Governance Lead notifies the Data Protection Officer.
+3. The Data Protection Authority is notified within 24 hours.
+4. Affected individuals are notified as required by the Act.
+5. Root-cause review conducted by the AI Stage Gate Governance Committee.
+
+---
+
+## Section 10 — Relationship to Other Instruments
+
+Primary strategic reference: Zimbabwe National Artificial Intelligence
+Strategy (2026-2030).
+
+Binding legislation: Cyber and Data Protection Act [Chapter 12:07].
+
+Related: SIRDC ICT and Information Management Policy, SIRDC Intellectual
+Property Policy, Internal AI Usage Guidelines.
+
+---
+
+## Section 11 — Compliance and Enforcement
+
+The AI Stage Gate Governance Committee establishes proportionate monitoring
+arrangements, supported by the Data Protection Officer, the ICT / information
+security function, Legal, and Internal Audit.
+
+Wilful or reckless disregard of mandatory requirements — especially those
+relating to data protection, security, or the safety of High-risk systems —
+is treated as a serious matter.
+
+---
+
+## Section 12 — Review
+
+This Policy is reviewed at least once every two years.
+
+---
+
+## Appendix B — Risk Classification Criteria
+
+An AI system is classified as **High risk** if its intended or reasonably
+foreseeable use may produce legal or similarly significant effects on
+individuals, affects critical infrastructure, public safety, or healthcare
+outcomes, or creates other material risks to rights, safety, or institutional
+interests.
+
+Examples of High risk: medical diagnosis, biometric identification,
+HR screening, safety-critical systems.
+
+Limited risk: chatbots, content generation, internal recommendation engines.
+
+Minimal risk: spam filters, internal search, productivity tools.
+
+---
+
+**Document Reference**: AIGP/01, Revision 01
+**Status**: DRAFT — for management approval
