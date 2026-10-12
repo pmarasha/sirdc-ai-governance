@@ -24,7 +24,6 @@ SIRDC_RED = "#B22222"
 SIRDC_ORANGE = "#E67E22"
 
 RISK_COLORS = {
-    "Prohibited": "#8B0000",
     "High": SIRDC_RED,
     "Limited": SIRDC_ORANGE,
     "Minimal": SIRDC_GREEN,
@@ -42,9 +41,20 @@ CSV_FILE = "ai_inventory.csv"
 INCIDENTS_FILE = "incidents.csv"
 
 INSTITUTES = [
-    "ICT", "Agriculture", "Health", "Manufacturing", "Energy",
-    "Mining", "Corporate Services", "Finance", "HR",
-    "Legal", "Communications", "Research",
+    "Biotechnology",
+    "Building Technology",
+    "Electronics and Communications",
+    "Energy Technology",
+    "Environmental Science",
+    "Food and Biomedical Technology",
+    "Geo-Information and Remote Sensing",
+    "Informatics and Artificial Intelligence",
+    "Metallurgy",
+    "National Metrology",
+    "Polymer Science",
+    "Production Engineering",
+    "ZTS (Commercialisation)",
+    "Corporate Services",
 ]
 
 MODEL_TYPES = ["LLM", "ML model", "Computer vision", "Time series",
@@ -279,7 +289,7 @@ def build_prompt(question: str, policy_text: str) -> str:
     return f"""You are SIRDC's AI Governance Assistant.
 Answer ONLY using the policy below. Cite section numbers like [Section 4.1].
 If the answer is not in the policy, say:
-"This is not covered in the policy. Recommend escalating to the AI Review Board."
+"This is not covered in the policy. Recommend escalating to the AI Stage Gate Governance Committee."
 Never invent rules. Keep answers under 120 words.
 
 POLICY:
@@ -473,7 +483,7 @@ st.markdown(
         <p class="hero-sub">Real-time oversight of AI systems across all SIRDC institutes</p>
         <p class="hero-meta">
             {today} &nbsp;·&nbsp; Prepared by <b>{st.session_state.current_user}</b>
-            &nbsp;·&nbsp; NIST AI RMF &nbsp;·&nbsp; ISO/IEC 42001
+            &nbsp;·&nbsp; AIGP/01 Rev 01 &nbsp;·&nbsp; NIST AI RMF &nbsp;·&nbsp; ISO/IEC 42001
         </p>
     </div>
     """,
@@ -493,7 +503,7 @@ with tab1:
     with st.expander("🔎  Filters", expanded=False):
         fc1, fc2, fc3, fc4 = st.columns(4)
         institutes = ["All"] + sorted(df["institute"].dropna().unique().tolist())
-        risks = ["All", "Prohibited", "High", "Limited", "Minimal", "Pending"]
+        risks = ["All", "High", "Limited", "Minimal", "Pending"]
         statuses = ["All"] + sorted(df["status"].dropna().unique().tolist())
 
         f_inst = fc1.selectbox("Institute", institutes)
@@ -587,7 +597,7 @@ with tab1:
 
     st.subheader("⚠️  Systems Requiring Attention")
     overdue = fdf[fdf["next_review"] < today]
-    high_risk = fdf[fdf["risk_tier"].isin(["High", "Prohibited"])]
+    high_risk = fdf[fdf["risk_tier"] == "High"]
 
     a1, a2, a3 = st.columns(3)
     with a1:
@@ -641,26 +651,30 @@ with tab1:
         st.markdown(
             f"""
             **Purpose** — Provides real-time visibility into every AI system
-            across SIRDC's institutes. Supports the AI Governance Framework, Phase 1.
+            across SIRDC's institutes, as required by the SIRDC Artificial
+            Intelligence Governance Policy (AIGP/01, Rev 01).
 
             **Data source** — AI systems are registered via the
             "Register AI System" tab. Incidents are logged via the
             "Report Incident" tab.
 
-            **Risk tiers** — Prohibited / High / Limited / Minimal / Pending,
-            following NIST AI RMF and the EU AI Act.
+            **Risk tiers** — High / Limited / Minimal / Pending, following
+            the risk classification approach in AIGP/01 Appendix B.
 
             **Review cadence** — High-risk: every 6 months.
             Limited and minimal-risk: every 12 months.
 
-            **Standards** — NIST AI RMF · ISO/IEC 42001 ·
-            Zimbabwe National AI Strategy (2026–2030).
+            **Standards alignment** — SIRDC AI Governance Policy (AIGP/01) ·
+            Zimbabwe National AI Strategy (2026–2030) ·
+            Cyber and Data Protection Act [Chapter 12:07] ·
+            NIST AI RMF · ISO/IEC 42001.
 
             **Policy Assistant** — Answers use only the SIRDC AI Policy document
             as its source, powered by Google Gemini. Every interaction is logged.
-            It does not make binding decisions — escalate to the AI Review Board.
+            It does not make binding decisions — escalate to the AI Stage Gate
+            Governance Committee.
 
-            **Version** — v2.3 · Phase 1 · {today}
+            **Version** — v3.0 · Aligned to AIGP/01 Rev 01 · {today}
             """
         )
 
@@ -711,7 +725,7 @@ with tab2:
             data_types = st.multiselect(
                 "Data types used *",
                 DATA_TYPES,
-                help="Select all that apply. This determines the risk tier.",
+                help="Select all that apply. This determines the risk tier under AIGP/01 §9.2.",
             )
 
             users = st.text_input(
@@ -730,7 +744,8 @@ with tab2:
 
             agreed = st.checkbox(
                 "I confirm the information provided is accurate and that this system "
-                "will comply with the SIRDC AI Policy *"
+                "will comply with the SIRDC Artificial Intelligence Governance Policy "
+                "(AIGP/01) *"
             )
 
             submitted = st.form_submit_button("Submit registration", use_container_width=True)
@@ -779,10 +794,10 @@ with tab2:
             **1. Automatic entry** — The system is added to the AI Inventory
             with status `Pending Review` and risk tier `Pending`.
 
-            **2. Governance Lead review** — Within 48 hours, the AI Governance
-            Lead reviews the submission and assigns a risk tier:
-            - **Prohibited** → System cannot proceed
-            - **High** → Escalated to the AI Review Board
+            **2. AI Stage Gate Governance Committee review** — Within 48 hours,
+            the AI Governance Lead reviews the submission and assigns a risk tier
+            per AIGP/01 §8 and Appendix B:
+            - **High** → Escalated to the AI Stage Gate Governance Committee
             - **Limited** or **Minimal** → Approved with conditions
 
             **3. Review cadence set** — High-risk systems reviewed every 6 months.
@@ -792,7 +807,7 @@ with tab2:
             email confirmations (Phase 2 feature).
 
             **5. Compliance** — The system now appears on the management
-            dashboard and is subject to SIRDC AI Policy.
+            dashboard and is subject to the SIRDC AI Governance Policy (AIGP/01).
             """
         )
 
@@ -919,13 +934,14 @@ with tab3:
     with st.expander("ℹ️  What happens after you report?"):
         st.markdown(
             """
-            **1. Immediate log** — Your report is logged with a unique incident ID.
+            **1. Immediate log** — Your report is logged with a unique incident ID,
+            as required by AIGP/01 §9.10.
 
-            **2. Governance Lead notified** — Within 24 hours, the AI Governance
+            **2. AI Governance Lead notified** — Within 24 hours, the AI Governance
             Lead reviews the report and categorises it:
             - **Low severity** — Logged for monthly review
             - **Medium** — Assigned to the Model Owner for investigation
-            - **High / Critical** — Escalated to the AI Review Board
+            - **High / Critical** — Escalated to the AI Stage Gate Governance Committee
 
             **3. System status** — The AI system is flagged on the management
             dashboard until the incident is resolved.
@@ -937,7 +953,11 @@ with tab3:
             and remains in the audit log permanently.
 
             **6. Privacy** — Your name and email are visible only to the
-            AI Governance Lead and the AI Review Board.
+            AI Governance Lead and the AI Stage Gate Governance Committee.
+
+            **7. Regulatory notification** — If the incident involves personal
+            data, the Data Protection Authority is notified within 24 hours,
+            as required by the Cyber and Data Protection Act [Chapter 12:07].
             """
         )
 
@@ -945,16 +965,16 @@ with tab3:
 with tab4:
     st.subheader("AI Policy Assistant")
     st.caption(
-        "Ask any question about SIRDC's AI Policy. Answers cite the relevant "
-        "section and every interaction is logged for audit."
+        "Ask any question about SIRDC's AI Governance Policy (AIGP/01). "
+        "Answers cite the relevant section and every interaction is logged for audit."
     )
 
     st.markdown("**Suggested questions**")
     suggestions = [
+        "What are the risk classification tiers?",
         "Can I send employee salaries to ChatGPT?",
-        "What is the review cadence for a facial recognition system?",
-        "Can I use anonymised patient data to train a model?",
         "Do I need approval to buy a third-party AI tool?",
+        "What happens if there is a data breach?",
     ]
 
     cols = st.columns(2)
@@ -994,7 +1014,8 @@ with tab4:
 st.markdown(
     "<hr style='border:1px solid #E5E7EB; margin-top:24px;'>"
     "<p style='text-align:center; color:#9CA3AF; font-size:12px; margin:0;'>"
-    "SIRDC AI Governance Framework · v2.3 · Aligned with NIST AI RMF and ISO/IEC 42001 · Internal use only"
+    "SIRDC AI Governance Framework · v3.0 · Aligned to AIGP/01 Rev 01 · "
+    "NIST AI RMF · ISO/IEC 42001 · Internal use only"
     "</p>",
     unsafe_allow_html=True,
 )
